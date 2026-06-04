@@ -1,16 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGuestbookDto } from './dto/create-guestbook.dto';
 import { UpdateGuestbookDto } from './dto/update-guestbook.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Guestbook } from './entities/guestbook.entity';
 import { Repository } from 'typeorm';
+import { Theme } from '@/themes/entities/theme.entity';
 
 @Injectable()
 export class GuestbookService {
-  constructor(@InjectRepository(Guestbook) private readonly guestbookRepository: Repository<Guestbook>) { }
+  constructor(@InjectRepository(Guestbook) private readonly guestbookRepository: Repository<Guestbook>,
+    @InjectRepository(Theme) private readonly themeRepository: Repository<Theme>,) { }
 
   async create(createGuestbookDto: CreateGuestbookDto) {
-    const guestbook = this.guestbookRepository.create(createGuestbookDto);
+    const { theme_id, ...guestbookData } = createGuestbookDto;
+    const theme = await this.themeRepository.findOne({ where: { id: theme_id } });
+
+    if (!theme) {
+      throw new NotFoundException(`ID ${theme_id} 테마를 찾을 수 없습니다`);
+    }
+
+    const guestbook = this.guestbookRepository.create({
+      ...guestbookData,
+      theme,
+    });
     await this.guestbookRepository.save(guestbook);
     return { id: guestbook.id };
   }

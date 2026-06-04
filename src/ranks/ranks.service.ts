@@ -1,16 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRankDto } from './dto/create-rank.dto';
-import { UpdateRankDto } from './dto/update-rank.dto';
 import { Rank } from './entities/rank.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Theme } from '@/themes/entities/theme.entity';
 
 @Injectable()
 export class RanksService {
-  constructor(@InjectRepository(Rank) private readonly rankRepository: Repository<Rank>) { }
+  constructor(
+    @InjectRepository(Rank) private readonly rankRepository: Repository<Rank>,
+    @InjectRepository(Theme) private readonly themeRepository: Repository<Theme>,
+  ) { }
 
   async create(createRankDto: CreateRankDto) {
-    const rank = this.rankRepository.create(createRankDto);
+    const { theme_id, ...rankData } = createRankDto;
+    const theme = await this.themeRepository.findOne({ where: { id: theme_id } });
+
+    if (!theme) {
+      throw new NotFoundException(`ID ${theme_id} 테마를 찾을 수 없습니다`);
+    }
+
+    const rank = this.rankRepository.create({
+      ...rankData,
+      theme,
+    });
     const savedRank = await this.rankRepository.save(rank);
     // 전체 유저의 순위를 매기는 서브쿼리
     const subQuery = this.rankRepository
@@ -37,12 +50,14 @@ export class RanksService {
   }
 
   async findRanksByTheme(themeId: number) {
-    return await this.rankRepository.find({
-      select: ['id', 'user_name', 'clear_time', 'hint_count', 'ending_type'],
+    const ranks = await this.rankRepository.find({
+      select: ['id', 'user_name', 'clear_time', 'hint_count', 'ending_type', 'createdAt'],
       where: { theme: { id: themeId } },
       order: { clear_time: 'ASC', hint_count: 'ASC', createdAt: 'ASC' },
       take: 50,
     });
+
+    return ranks;
   }
 
   async findOne(id: number) {
