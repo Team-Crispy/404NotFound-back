@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { ThemePuzzle } from "./theme_puzzle.entity";
+import { Theme } from "./theme.entity";
 
 @Entity()
 export class ThemeHint {
@@ -11,6 +12,10 @@ export class ThemeHint {
     @JoinColumn({ name: 'puzzle_id' })
     themePuzzle!: ThemePuzzle;
 
+    @ManyToOne(() => Theme, theme => theme.id, { nullable: false })
+    @JoinColumn({ name: 'theme_id' })
+    theme!: Theme
+
     // 힌트 단계
     @Column({ type: 'int', nullable: false })
     step!: number;
@@ -20,6 +25,6 @@ export class ThemeHint {
     content!: string;
 
     // 이 힌트가 표시될 최소 진행도
-    @Column({ type: 'float', nullable: false })
+    @Column({ type: 'float', nullable: true })
     progress_required!: number;
 }

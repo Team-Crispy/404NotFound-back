@@ -1,10 +1,10 @@
 import { Rank } from "@/ranks/entities/rank.entity";
 import { Theme } from "@/themes/entities/theme.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Guestbook {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id!: number;
 
     @ManyToOne(() => Rank, rank => rank.id, { nullable: true })
@@ -22,5 +22,5 @@ export class Guestbook {
     message!: string;
 
     @CreateDateColumn()
-    createAt!: Date;
+    createdAt!: Date;
 }

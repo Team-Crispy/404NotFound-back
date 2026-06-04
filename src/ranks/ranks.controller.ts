@@ -11,4 +11,14 @@ export class RanksController {
   create(@Body() createRankDto: CreateRankDto) {
     return this.ranksService.create(createRankDto);
   }
+
+  @Get(':themeId')
+  findRanksByTheme(@Param('themeId') themeId: number) {
+    return this.ranksService.findRanksByTheme(themeId);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.ranksService.findOne(+id);
+  }
 }

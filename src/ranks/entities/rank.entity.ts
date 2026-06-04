@@ -1,9 +1,9 @@
 import { Theme } from '@/themes/entities/theme.entity';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Rank {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id!: number;
 
     @ManyToOne(() => Theme, theme => theme.id, { nullable: false })

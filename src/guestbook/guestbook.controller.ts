@@ -7,9 +7,14 @@ import { UpdateGuestbookDto } from './dto/update-guestbook.dto';
 export class GuestbookController {
   constructor(private readonly guestbookService: GuestbookService) {}
 
-  @Get()
-  findAll() {
-    return this.guestbookService.findAll();
+  @Post()
+  create(@Body() createGuestbookDto: CreateGuestbookDto) {
+    return this.guestbookService.create(createGuestbookDto);
+  }
+
+  @Get(':themeId')
+  findAll(@Param('themeId') themeId: string) {
+    return this.guestbookService.findAll(+themeId);
   }
 
   @Get(':id')
