@@ -41,6 +41,7 @@ export class RanksService {
       select: ['id', 'user_name', 'clear_time', 'hint_count', 'ending_type'],
       where: { theme: { id: themeId } },
       order: { clear_time: 'ASC', hint_count: 'ASC', createdAt: 'ASC' },
+      take: 50,
     });
   }
 

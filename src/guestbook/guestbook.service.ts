@@ -7,17 +7,22 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class GuestbookService {
-  constructor(@InjectRepository(Guestbook) private readonly guestbookRepository: Repository<Guestbook>) {}
+  constructor(@InjectRepository(Guestbook) private readonly guestbookRepository: Repository<Guestbook>) { }
 
   async create(createGuestbookDto: CreateGuestbookDto) {
     const guestbook = this.guestbookRepository.create(createGuestbookDto);
     await this.guestbookRepository.save(guestbook);
-    return { id : guestbook.id };
+    return { id: guestbook.id };
   }
 
   async findAll(themeId: number) {
     return await this.guestbookRepository.find(
-      { select: ['id', 'user_name', 'createdAt', 'message'], where: { theme: { id: themeId } } });
+      {
+        select: ['id', 'user_name', 'createdAt', 'message'],
+        where: { theme: { id: themeId } },
+        take: 50,
+        order: { createdAt: 'DESC' },
+      });
   }
 
   async findOne(id: number) {
