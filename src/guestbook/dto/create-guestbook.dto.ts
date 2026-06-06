@@ -1,1 +1,19 @@
-export class CreateGuestbookDto {}
+import { ApiProperty } from "node_modules/@nestjs/swagger/dist";
+import { IsNumber, IsNotEmpty, IsString } from "class-validator";
+
+export class CreateGuestbookDto {
+    @ApiProperty({ example: '1', description: '테마 ID' })
+    @IsNotEmpty()
+    @IsNumber()
+    theme_id!: number;
+
+    @ApiProperty({ example: '1', description: '랭킹 ID' })
+    @IsNotEmpty()
+    @IsNumber()
+    rank_id?: number;
+
+    @ApiProperty({ example: '멋진 테마네요!', description: '방명록 메시지' })
+    @IsNotEmpty()
+    @IsString()
+    message!: string;
+}
