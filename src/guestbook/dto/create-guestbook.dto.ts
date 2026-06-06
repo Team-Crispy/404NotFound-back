@@ -7,11 +7,6 @@ export class CreateGuestbookDto {
     @IsNumber()
     theme_id!: number;
 
-    @ApiProperty({ example: '1', description: '랭킹 ID' })
-    @IsNotEmpty()
-    @IsNumber()
-    rank_id?: number;
-
     @ApiProperty({ example: 'test123', description: '유저 이름' })
     @IsNotEmpty()
     @IsString()

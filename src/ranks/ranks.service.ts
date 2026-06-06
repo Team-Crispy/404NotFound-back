@@ -33,7 +33,7 @@ export class RanksService {
       .addSelect('sub.clear_time', 'clear_time')
       .addSelect('sub.hint_count', 'hint_count')
       .addSelect('sub.createdAt', 'createdAt')
-      .addSelect('RANK() OVER (ORDER BY sub.clear_time ASC, sub.hint_count ASC, sub.createdAt ASC)', 'rankNum');
+      .addSelect('RANK() OVER (ORDER BY sub.clear_time DESC, sub.hint_count ASC, sub.createdAt ASC)', 'rankNum');
 
     // 서브쿼리를 이용해 현재 저장된 랭크의 순위를 가져오는 쿼리
     const rankResult = await this.rankRepository.manager
@@ -50,17 +50,40 @@ export class RanksService {
   }
 
   async findRanksByTheme(themeId: number) {
-    const ranks = await this.rankRepository.find({
-      select: ['id', 'user_name', 'clear_time', 'hint_count', 'ending_type', 'createdAt'],
-      where: { theme: { id: themeId } },
-      order: { clear_time: 'ASC', hint_count: 'ASC', createdAt: 'ASC' },
-      take: 50,
-    });
+    if (!await this.themeRepository.findOne({ where: { id: themeId } })) {
+      throw new NotFoundException(`ID ${themeId} 테마를 찾을 수 없습니다`);
+    }
 
-    return ranks;
+    const ranks = await this.rankRepository
+    .createQueryBuilder('rank')
+    .select('rank.user_name', 'user_name')
+    .addSelect('rank.clear_time', 'clear_time')
+    .addSelect('rank.hint_count', 'hint_count')
+    .addSelect('rank.ending_type', 'ending_type')
+    .addSelect(
+      'RANK() OVER (ORDER BY rank.clear_time DESC, rank.hint_count ASC, rank.createdAt ASC)', 
+      'rank'
+    )
+    .where('rank.theme_id = :themeId', { themeId })
+    .limit(50)
+    .getRawMany();
+
+  return ranks.map(r => ({
+    rank: Number(r.rank),
+    user_name: r.user_name,
+    clear_time: Number(r.clear_time),
+    hint_count: Number(r.hint_count),
+    ending_type: r.ending_type
+  }));
   }
 
   async findOne(id: number) {
-    return await this.rankRepository.findOne({ select: ['id', 'user_name', 'clear_time', 'hint_count', 'ending_type'], where: { id } });
+    const rank = await this.rankRepository.findOne({ select: ['id', 'user_name', 'clear_time', 'hint_count', 'ending_type'], where: { id } });
+
+    if (!rank) {
+      throw new NotFoundException(`ID ${id} 랭킹을 찾을 수 없습니다`);
+    }
+
+    return rank;
   }
 }

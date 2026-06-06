@@ -28,6 +28,10 @@ export class GuestbookService {
   }
 
   async findAll(themeId: number) {
+    if (!await this.themeRepository.findOne({ where: { id: themeId } })) {
+      throw new NotFoundException(`ID ${themeId} 테마를 찾을 수 없습니다`);
+    }
+
     return await this.guestbookRepository.find(
       {
         select: ['id', 'user_name', 'createdAt', 'message'],
@@ -38,6 +42,12 @@ export class GuestbookService {
   }
 
   async findOne(id: number) {
-    return await this.guestbookRepository.findOne({ select: ['id', 'user_name', 'createdAt', 'message'], where: { id } });
+    const guestbook = await this.guestbookRepository.findOne({ select: ['id', 'user_name', 'createdAt', 'message'], where: { id } });
+
+    if (!guestbook) {
+      throw new NotFoundException(`ID ${id} 방명록을 찾을 수 없습니다`);
+    }
+
+    return guestbook;
   }
 }

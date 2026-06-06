@@ -7,10 +7,10 @@ export class SubmitAnswerDto {
     @IsNumber()
     theme_id!: number;
 
-    @ApiProperty({ example: '0', description: '문제 ID' })
+    @ApiProperty({ example: '0', description: '문제 단계' })
     @IsNotEmpty()
     @IsNumber()
-    puzzle_id!: number;
+    sequence!: number;
 
     @ApiProperty({ example: '1025', description: '제출한 답안' })
     @IsNotEmpty()
