@@ -4,12 +4,14 @@ import { Rank } from './entities/rank.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Theme } from '@/themes/entities/theme.entity';
+import { Guestbook } from '@/guestbook/entities/guestbook.entity';
 
 @Injectable()
 export class RanksService {
   constructor(
     @InjectRepository(Rank) private readonly rankRepository: Repository<Rank>,
     @InjectRepository(Theme) private readonly themeRepository: Repository<Theme>,
+    @InjectRepository(Guestbook) private readonly guestbookRepository: Repository<Guestbook>,
   ) { }
 
   async create(createRankDto: CreateRankDto) {
@@ -55,22 +57,25 @@ export class RanksService {
     }
 
     const ranks = await this.rankRepository
-    .createQueryBuilder('rank')
-    .select('rank.user_name', 'user_name')
-    .addSelect('rank.clear_time', 'clear_time')
-    .addSelect('rank.hint_count', 'hint_count')
-    .addSelect('rank.ending_type', 'ending_type')
+    .createQueryBuilder('ranks')
+    .select('ranks.user_name', 'user_name')
+    .addSelect('ranks.clear_time', 'clear_time')
+    .addSelect('ranks.hint_count', 'hint_count')
+    .addSelect('ranks.ending_type', 'ending_type')
     .addSelect(
-      'RANK() OVER (ORDER BY rank.clear_time DESC, rank.hint_count ASC, rank.createdAt ASC)', 
+      'RANK() OVER (ORDER BY ranks.clear_time DESC, ranks.hint_count ASC, ranks.createdAt ASC)', 
       'rank'
     )
-    .where('rank.theme_id = :themeId', { themeId })
+    .addSelect('guestbook.message', 'message')
+    .leftJoinAndSelect('ranks.guestbook', 'guestbook')
+    .where('ranks.theme_id = :themeId', { themeId })
     .limit(50)
     .getRawMany();
 
   return ranks.map(r => ({
     rank: Number(r.rank),
     user_name: r.user_name,
+    message: r.message,
     clear_time: Number(r.clear_time),
     hint_count: Number(r.hint_count),
     ending_type: r.ending_type
