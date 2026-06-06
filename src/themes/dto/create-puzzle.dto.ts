@@ -20,12 +20,6 @@ export class CreatePuzzleDto {
     @IsNotEmpty()
     hint_content!: string;
 
-    // 퍼즐 힌트 단계
-    @ApiProperty({ description: '힌트 단계', example: 1 })
-    @IsInt()
-    @IsNotEmpty()
-    hint_step!: number;
-
     // 힌트 공개를 위한 진행도
     @ApiProperty({ description: '힌트 공개를 위한 진행도', example: 0.5 })
     @IsNumber()

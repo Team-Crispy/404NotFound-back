@@ -53,7 +53,6 @@ export class ThemesService {
       theme,
       themePuzzle: puzzle,
       content: createPuzzleDto.hint_content,
-      step: createPuzzleDto.hint_step,
       progress_required: createPuzzleDto.progress_required,
     });
     await this.themeHintRepository.save(hint);

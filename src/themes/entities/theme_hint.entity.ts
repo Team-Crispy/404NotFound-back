@@ -20,9 +20,6 @@ export class ThemeHint {
     @Column({ type: 'text', nullable: false })
     content!: string;
 
-    @Column({ type: 'int', nullable: false })
-    step!: number;
-
     // 이 힌트가 표시될 최소 진행도
     @Column({ type: 'float', nullable: true })
     progress_required!: number;

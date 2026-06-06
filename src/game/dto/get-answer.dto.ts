@@ -11,4 +11,5 @@ export class GetAnswerDto {
     @IsNotEmpty()
     @IsNumber()
     sequence!: number;
+
 }
