@@ -1,11 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Theme } from "./theme.entity";
 
 
 @Entity()
 export class ThemeEnding {
     // 기본키
-    @PrimaryColumn() 
+    @PrimaryGeneratedColumn()
     id!: number;
 
     // 테마 외래키
